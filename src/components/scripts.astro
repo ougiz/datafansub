@@ -100,7 +100,13 @@
     });
   }
 
-  if (selected === "name-asc") {
+  if (selected === "recently-updated") {
+    filteredSortedPairs.sort(([rowA], [rowB]) => {
+      const updatedA = rowA.getAttribute("data-updated") || "";
+      const updatedB = rowB.getAttribute("data-updated") || "";
+      return updatedB.localeCompare(updatedA);
+    });
+  } else if (selected === "name-asc") {
     filteredSortedPairs.sort(([rowA], [rowB]) =>
       (rowA.getAttribute("data-name") || "").localeCompare(
         rowB.getAttribute("data-name") || ""
@@ -122,6 +128,7 @@
 
   currentPage = 1;
   updatePagination();
+  tableBody.classList.add("js-ready");
 }
 
 
@@ -346,7 +353,19 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     allPairsOriginal = captureOriginalPairs();
-    sortAndFilterTable();
+    const filter = input.value.trim().toLowerCase();
+    const selected = sortSelect.value;
+    
+    if (filter === "" && selected === "recently-updated") {
+      filteredSortedPairs = [...allPairsOriginal];
+    } else {
+      sortAndFilterTable();
+      return;
+    }
+    
+    currentPage = 1;
+    updatePagination();
+    tableBody.classList.add("js-ready");
     expandFromHash();
   });
 </script>
