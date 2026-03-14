@@ -4,3 +4,4 @@ dockerfile @ougihz
 package.json @ougihz
 pnpm-lock.yaml @ougihz
 astro.config.mjs @ougihz
+pb_schema.json @ougihz

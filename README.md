@@ -53,30 +53,38 @@ The output will be in the `dist/` directory.
 Create a `.env` file in the root directory:
 
 ```env
-PUBLIC_API_URL=https://your-pocketbase-instance/api
+PUBLIC_API_URL=https://datafansub.bye.moe
 ```
 
 ## Project Structure
 
 ```
 src/
-├── components/       # Astro components
-│   ├── common/       # Shared components (navbar, pagination)
-│   └── entryTable.astro
-├── lib/              # TypeScript utilities
-│   ├── types.ts      # Type definitions
-│   ├── utils.ts      # Helper functions
-│   ├── anilist.ts   # AniList API integration
-│   └── datafansub.ts # Main data fetching
-├── pages/            # Astro pages
+├── components/           # Astro components
+│   ├── common/           # Shared components
+│   │   ├── navbar.astro
+│   │   └── pagination.astro
+│   ├── entryTable.astro
+│   └── scripts.astro
+├── lib/                  # TypeScript utilities
+│   ├── types.ts          # Type definitions
+│   ├── utils.ts          # Helper functions
+│   ├── anilist.ts        # AniList API integration
+│   └── datafansub.ts     # Main data fetching
+├── pages/                # Astro pages
 │   ├── index.astro
-│   └── about.astro
-└── styles/           # CSS files (modular)
+│   ├── about.astro
+│   ├── health.astro
+│   └── boochi.ts
+└── styles/               # CSS files (modular)
     ├── variables.css
     ├── base.css
+    ├── global.css
     ├── navbar.css
     ├── table.css
-    └── mobile.css
+    ├── mobile.css
+    ├── pagination.css
+    └── about.css
 ```
 
 ## License
