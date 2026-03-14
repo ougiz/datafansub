@@ -1,0 +1,155 @@
+@media (max-width: 1024px) {
+  .navbar { padding: 0.75rem 1rem; }
+  .navbar-left { gap: 1rem; }
+  .navbar-links { gap: 0.75rem; }
+  .search-box { min-width: 180px; }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .navbar-left, .navbar-right { width: 100%; }
+  .navbar-links { justify-content: space-around; }
+  .search-box { max-width: 100%; min-width: 0; }
+  .sort-select { display: none; }
+}
+
+@media (max-width: 600px) {
+  .table-wrapper {
+    overflow-x: visible;
+    margin: 1rem;
+    border-radius: 2px;
+  }
+  #animeTable {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+  #animeTable thead { display: none; }
+  #animeTable tbody { display: block; width: 100%; }
+  #animeTable tr.anime-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface);
+    cursor: pointer;
+  }
+  .poster-cell {
+    grid-column: 1;
+    padding: 0 !important;
+    align-self: center;
+  }
+  .poster-wrapper { width: 100%; }
+  .poster {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2/3;
+    border-radius: var(--radius-sm);
+  }
+  #animeTable tr.anime-row > td:not(.poster-cell) {
+    grid-column: 2;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  #animeTable tr.anime-row > td:not(.poster-cell)::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+  #animeTable tr.anime-row.expanded td { background-color: var(--hover); }
+  #animeTable tr.expand-content {
+    display: none;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    background-color: var(--surface);
+    margin-bottom: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  tr.anime-row.expanded + tr.expand-content { display: block; }
+  .expand-inner {
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .entry-table {
+    width: 100% !important;
+    font-size: 0.85rem;
+    table-layout: fixed;
+    padding: 0.5rem;
+    box-sizing: border-box;
+  }
+  .entry-table thead { display: none; }
+  .entry-table tbody { display: block; width: 100%; }
+  .entry-table tr {
+    display: block;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .entry-table tr:last-child { border-bottom: none; }
+  .entry-table td {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 0.25rem 0 !important;
+    border: none !important;
+  }
+  .entry-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--primary);
+    flex: 0 0 100%;
+    margin-bottom: 0.25rem;
+  }
+  .fansubs-season { flex-direction: column; gap: 0.25rem; }
+  .fansubs-season div { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+  .season-select-container { margin-bottom: 1rem; width: 100%; }
+  .season-select {
+    width: 100%;
+    max-width: 100% !important;
+  }
+  .season-select-container .season-select { max-width: 30%; padding: 0.5rem 2rem 0.5rem 0.75rem; }
+  .entry-link { margin-right: 0.5rem; margin-bottom: 0.5rem; }
+  .variant-text { display: none; }
+  .expand-inner { padding: 1rem; }
+  .entry-table th, .entry-table td { padding: 0.5rem; font-size: 0.8rem; }
+  #animeTable tr.anime-row.expanded { background-color: var(--hover); }
+  #animeTable tr.anime-row.expanded td { background-color: transparent; }
+  .filter-btn {
+    display: flex !important;
+    height: 2.5rem;
+    padding: 0 1rem;
+    margin-left: 0.5rem;
+    background-color: var(--surface);
+    color: var(--on-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .filter-btn:hover { background-color: var(--hover); transform: translateY(-1px); }
+  #sortSelect { display: none; }
+  .filter-btn { display: flex !important; }
+}
+
+@media (min-width: 601px) {
+  .filter-btn { display: none !important; }
+}

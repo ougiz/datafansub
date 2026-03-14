@@ -1,0 +1,352 @@
+<script>
+  const input = document.getElementById("searchInput") as HTMLInputElement;
+  const btn = document.getElementById("searchBtn") as HTMLButtonElement;
+  const sortSelect = document.getElementById("sortSelect") as HTMLSelectElement;
+
+  const animeTable = document.getElementById("animeTable") as HTMLTableElement;
+  const tableBody = animeTable.getElementsByTagName("tbody")[0];
+
+  const prevPageBtn = document.getElementById(
+    "prevPageBtn"
+  ) as HTMLButtonElement;
+  const nextPageBtn = document.getElementById(
+    "nextPageBtn"
+  ) as HTMLButtonElement;
+  const pageInfo = document.getElementById("pageInfo") as HTMLSpanElement;
+  const pageInput = document.getElementById("pageInput") as HTMLInputElement;
+
+  const filterBtn = document.getElementById("filterBtn") as HTMLButtonElement;
+  const mobileFilterMenu = document.getElementById(
+    "mobileFilterMenu"
+  ) as HTMLDivElement;
+
+  const rowsPerPage = 15;
+  let currentPage = 1;
+
+  let allPairsOriginal: [HTMLTableRowElement, HTMLTableRowElement][] = [];
+  let filteredSortedPairs: [HTMLTableRowElement, HTMLTableRowElement][] = [];
+
+  function captureOriginalPairs(): [
+    HTMLTableRowElement,
+    HTMLTableRowElement,
+  ][] {
+    const allRows = Array.from(
+      document.querySelectorAll("tr.anime-row")
+    ) as HTMLTableRowElement[];
+    const allExpandRows = Array.from(
+      document.querySelectorAll("tr.expand-content")
+    ) as HTMLTableRowElement[];
+    const pairs: [HTMLTableRowElement, HTMLTableRowElement][] = [];
+    for (let i = 0; i < allRows.length; i++) {
+      pairs.push([allRows[i], allExpandRows[i]]);
+    }
+    return pairs;
+  }
+
+  function updatePagination(): void {
+    const totalPages = Math.ceil(filteredSortedPairs.length / rowsPerPage) || 1;
+
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    tableBody.innerHTML = "";
+
+    if (filteredSortedPairs.length === 0) {
+      pageInfo.textContent = "Página 0 de 0";
+      prevPageBtn.disabled = true;
+      nextPageBtn.disabled = true;
+      pageInput.value = "0";
+      return;
+    }
+
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+
+    filteredSortedPairs
+      .slice(startIndex, endIndex)
+      .forEach(([mainRow, expandRow]) => {
+        tableBody.appendChild(mainRow);
+        tableBody.appendChild(expandRow);
+      });
+
+    pageInfo.textContent = `page ${currentPage} of ${totalPages}`;
+    pageInput.value = currentPage.toString();
+
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages;
+
+    attachRowClickHandlers();
+  }
+
+ function sortAndFilterTable(): void {
+  const filter = input.value.trim().toLowerCase();
+  const selected = sortSelect.value;
+
+  if (filter === "") {
+    filteredSortedPairs = [...allPairsOriginal];
+  } else {
+    filteredSortedPairs = allPairsOriginal.filter(([row]) => {
+      const name = row.getAttribute("data-name") || "";
+      const fansub = row.getAttribute("data-fansub") || "";
+      const romajiSpan = row.querySelector("td:nth-child(2) .romaji");
+      const romaji = romajiSpan
+        ? romajiSpan.textContent?.toLowerCase() || ""
+        : "";
+      return (
+        name.includes(filter) ||
+        romaji.includes(filter) ||
+        fansub.includes(filter)
+      );
+    });
+  }
+
+  if (selected === "name-asc") {
+    filteredSortedPairs.sort(([rowA], [rowB]) =>
+      (rowA.getAttribute("data-name") || "").localeCompare(
+        rowB.getAttribute("data-name") || ""
+      )
+    );
+  } else if (selected === "year-asc") {
+    filteredSortedPairs.sort(([rowA], [rowB]) => {
+      const yearA = rowA.cells[2]?.textContent?.trim() || "";
+      const yearB = rowB.cells[2]?.textContent?.trim() || "";
+      return yearA.localeCompare(yearB);
+    });
+  } else if (selected === "year-desc") {
+    filteredSortedPairs.sort(([rowA], [rowB]) => {
+      const yearA = rowA.cells[2]?.textContent?.trim() || "";
+      const yearB = rowB.cells[2]?.textContent?.trim() || "";
+      return yearB.localeCompare(yearA);
+    });
+  } 
+
+  currentPage = 1;
+  updatePagination();
+}
+
+
+  function attachRowClickHandlers(): void {
+    document.querySelectorAll(".anime-row").forEach((row) => {
+      row.replaceWith(row.cloneNode(true));
+    });
+
+    document.querySelectorAll(".anime-row").forEach((row) => {
+      row.addEventListener("click", () => {
+        row.classList.toggle("expanded");
+        const next = row.nextElementSibling as HTMLTableRowElement;
+
+        if (next?.classList.contains("expand-content")) {
+          const isExpanded = row.classList.contains("expanded");
+          next.style.display = isExpanded ? "table-row" : "none";
+
+          if (isExpanded) {
+            setTimeout(() => {
+              const nextRect = next.getBoundingClientRect();
+              const rowRect = row.getBoundingClientRect();
+              const viewportHeight = window.innerHeight;
+
+              const desiredTop = window.scrollY + rowRect.top - 10;
+
+              const nextTop = nextRect.top;
+              const nextBottom = nextRect.bottom;
+              const isFullyVisible =
+                nextTop >= 0 && nextBottom <= viewportHeight;
+
+              if (!isFullyVisible || rowRect.top < 10) {
+                const navbar = document.querySelector(".navbar") as HTMLElement;
+                const navbarHeight = navbar?.offsetHeight || 0;
+                window.scrollTo({
+                  top: window.scrollY + rowRect.top - navbarHeight - 10,
+                  behavior: "smooth",
+                });
+              }
+            }, 100);
+          }
+        }
+      });
+    });
+  }
+
+  prevPageBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updatePagination();
+    }
+  });
+
+  nextPageBtn.addEventListener("click", () => {
+    const totalPages = Math.ceil(filteredSortedPairs.length / rowsPerPage);
+    if (currentPage < totalPages) {
+      currentPage++;
+      updatePagination();
+    }
+  });
+
+  pageInput.addEventListener("change", () => {
+    let val = parseInt(pageInput.value, 10);
+    const totalPages = Math.ceil(filteredSortedPairs.length / rowsPerPage) || 1;
+
+    if (isNaN(val) || val < 1) val = 1;
+    if (val > totalPages) val = totalPages;
+
+    if (val !== currentPage) {
+      currentPage = val;
+      updatePagination();
+    } else {
+      pageInput.value = currentPage.toString();
+    }
+  });
+
+  sortSelect.addEventListener("change", () => {
+    sortAndFilterTable();
+  });
+
+  btn.addEventListener("click", () => {
+    sortAndFilterTable();
+  });
+
+  input.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      sortAndFilterTable();
+    }
+  });
+
+  filterBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (window.innerWidth <= 600) {
+      mobileFilterMenu.classList.toggle("hidden");
+      if (!mobileFilterMenu.classList.contains("hidden")) {
+        mobileFilterMenu.innerHTML = "";
+
+        const selectClone = sortSelect.cloneNode(true) as HTMLSelectElement;
+        selectClone.id = "mobileSortSelect";
+        selectClone.value = sortSelect.value;
+
+        selectClone.style.width = "100%";
+        selectClone.style.padding = "0.25rem 1rem";
+        selectClone.style.fontSize = "1rem";
+        selectClone.style.display = "block";
+
+        selectClone.addEventListener("change", () => {
+          sortSelect.value = selectClone.value;
+          sortAndFilterTable();
+          mobileFilterMenu.classList.add("hidden");
+        });
+
+        mobileFilterMenu.appendChild(selectClone);
+      }
+    }
+  });
+
+  document.addEventListener("click", (e: Event) => {
+    if (
+      !mobileFilterMenu.contains(e.target as Node) &&
+      e.target !== filterBtn
+    ) {
+      mobileFilterMenu.classList.add("hidden");
+    }
+  });
+
+  mobileFilterMenu.addEventListener("click", (e: Event) => {
+    e.stopPropagation();
+  });
+
+  declare global {
+    interface Window {
+      copyEntryLink: (animeId: string) => void;
+      handleSeasonChange: (select: HTMLSelectElement, animeId: string) => void;
+    }
+  }
+
+  window.copyEntryLink = function (animeId: string): void {
+    if (!animeId) return;
+
+    let hash = 0;
+    for (let i = 0; i < animeId.length; i++) {
+      hash = (hash * 31 + animeId.charCodeAt(i)) % 100000;
+    }
+    const shortId = hash.toString().padStart(5, "0");
+
+    const url = `${window.location.origin}${window.location.pathname}#${shortId}`;
+
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        const btn = document.querySelector(
+          `button[onclick="copyEntryLink('${animeId}')"]`
+        ) as HTMLButtonElement;
+        if (!btn) return;
+
+        btn.classList.add("copied");
+        setTimeout(() => btn.classList.remove("copied"), 400);
+      })
+      .catch(() => console.error("Error copying link"));
+  };
+
+  function expandFromHash(): void {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+
+    let targetIndex = filteredSortedPairs.findIndex(([row]) => {
+      const animeId = row.getAttribute("data-anime");
+      if (!animeId) return false;
+
+      let numericHash = 0;
+      for (let i = 0; i < animeId.length; i++) {
+        numericHash = (numericHash * 31 + animeId.charCodeAt(i)) % 100000;
+      }
+
+      const rowHash = numericHash.toString().padStart(5, "0");
+      return rowHash === hash;
+    });
+
+    if (targetIndex === -1) return;
+
+    const targetPage = Math.floor(targetIndex / rowsPerPage) + 1;
+    currentPage = targetPage;
+
+    updatePagination();
+
+    setTimeout(() => {
+      const startIndex = (currentPage - 1) * rowsPerPage;
+      const indexInPage = targetIndex - startIndex;
+      const mainRows = tableBody.querySelectorAll("tr.anime-row");
+      const mainRow = mainRows[indexInPage] as HTMLTableRowElement;
+
+      if (mainRow) {
+        const nextExpand = mainRow.nextElementSibling as HTMLTableRowElement;
+
+        if (nextExpand?.classList.contains("expand-content")) {
+          mainRow.classList.add("expanded");
+          nextExpand.style.display = "table-row";
+
+          const navbar = document.querySelector(".navbar") as HTMLElement;
+          const navbarHeight = navbar?.offsetHeight || 0;
+          const rowTop = mainRow.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({
+            top: rowTop - navbarHeight - 10,
+            behavior: "smooth",
+          });
+        }
+      }
+    }, 50);
+  }
+
+  window.handleSeasonChange = function (
+    select: HTMLSelectElement,
+    animeId: string
+  ): void {
+    document
+      .querySelectorAll(`.season-details[data-anime="${animeId}"]`)
+      .forEach((el) => {
+        (el as HTMLElement).style.display =
+          el.getAttribute("data-season") === select.value ? "" : "none";
+      });
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    allPairsOriginal = captureOriginalPairs();
+    sortAndFilterTable();
+    expandFromHash();
+  });
+</script>

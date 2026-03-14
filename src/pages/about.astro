@@ -1,0 +1,275 @@
+---
+import "../styles/global.css";
+import "../styles/about.css";
+import { fetchData } from "../lib/datafansub";
+
+const { entries, fansubs } = await fetchData();
+const fansubsConLinks = new Set<string>();
+entries.forEach((entry) => {
+  if (entry.nyaa || entry.nekobt) {
+    entry.fansub.forEach((fId) => fansubsConLinks.add(fId));
+  }
+});
+
+const countMap = new Map<string, number>();
+entries.forEach((entry) => {
+  entry.fansub.forEach((id) => {
+    if (fansubsConLinks.has(id)) {
+      countMap.set(id, (countMap.get(id) ?? 0) + 1);
+    }
+  });
+});
+
+const fansubEntryCount = Array.from(countMap.entries())
+  .map(([id, count]) => {
+    const fansub = fansubs.find((f) => f.id === id);
+    return {
+      id,
+      name: fansub?.name ?? "Desconocido",
+      website: fansub?.website ?? null,
+      count,
+    };
+  })
+  .filter((f) => f.name !== "Desconocido")
+  .sort((a, b) => b.count - a.count);
+---
+
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About | dataFansub</title>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-left">
+        <h1 id="homeTitle" class="navbar-title">
+          <a href="/" style="color: inherit; text-decoration: none;"
+            >dataFansub</a
+          >
+        </h1>
+        <a href="/about" class="navbar-link">About</a>
+        <a
+          href="https://discord.gg/JRghDjK3nA"
+          target="_blank"
+          aria-label="Únete a Discord"
+          style="display:inline-block; width:24px; height:24px;"
+        >
+          <svg
+            viewBox="0 -28.5 256 256"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="#5865F2"
+          >
+            <path
+              d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z"
+            ></path>
+          </svg>
+        </a>
+      </div>
+    </nav>
+
+    <main style="max-width: 800px; margin: 2rem auto; padding: 1rem;">
+      <h2 style="font-size: 2rem; margin-bottom: 1rem;">¿Qué es dataFansub?</h2>
+      <p>
+        Es un index dedicado a recomendar releases trabajados por fansubs en
+        español, que publican principalmente en <a
+          class="link-style"
+          href="https://nyaa.si"
+          target="_blank"
+          rel="noopener noreferrer">Nyaa</a
+        > o <a
+          class="link-style"
+          href="https://nekobt.to"
+          target="_blank"
+          rel="noopener noreferrer">nekoBT</a
+        >. La idea es mantener el sitio actualizado con los animes de temporada
+        y de a poco ir agregando los de temporadas anteriores. Este sitio solo
+        muestra información de lanzamientos, no alojamos torrents.
+      </p>
+
+      <h3 style="margin-top: 2rem; font-size: 1.5rem;">
+        Categorías y términos usados
+      </h3>
+      <p>
+        Cada <strong>entrada</strong> tiene algunos campos que ayudan a entender
+        el estado y origen del release.
+      </p>
+
+      <ul style="margin-left: 1rem; list-style: disc;">
+        <li>
+          <strong>Status</strong>:
+          <ul style="margin-left: 1.5rem; list-style: circle;">
+            <li>
+              <strong>Completed</strong>: El anime está completamente
+              subtitulado por el fansub.
+            </li>
+            <li>
+              <strong>In progress</strong>: El fansub puede que esté trabajando
+              nuevos episodios.
+            </li>
+            <li>
+              <strong>Dropped</strong>: El proyecto se considera abandonado si
+              lleva alrededor de <strong>3 meses sin updates</strong>.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Source video</strong>:
+          <ul style="margin-left: 1.5rem; list-style: circle;">
+            <li><strong>BD</strong>: Fuente Blu-ray.</li>
+            <li>
+              <strong>WEB</strong>: Fuente WEBRip/WEB-DL (plataformas de
+              streaming).
+            </li>
+            <li><strong>DVD</strong>: Fuente DVD.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Spanish variant</strong>:
+          <ul style="margin-left: 1.5rem; list-style: circle;">
+            <li><strong>es-419</strong>: Español latinoamericano.</li>
+            <li><strong>es-ES</strong>: Español de España.</li>
+          </ul>
+        </li>
+      </ul>
+      <h3 style="margin-top: 2rem; font-size: 1.5rem;">
+        Otros temas de interés
+      </h3>
+      <ul style="margin-left: 1rem; padding-left: 1rem;">
+        <li>
+          El sitio web cuenta con su propio bot de Discord llamado <strong
+            >Shinobu</strong
+          >, el cual te permite consultar fácilmente la información de las
+          entradas añadidas usando el comando <strong>/datafansub</strong>.
+          Puedes agregarlo desde
+          <a
+            class="link-style"
+            href="https://discord.com/oauth2/authorize?client_id=1125267002420908112&permissions=18432&integration_type=0&scope=bot+applications.commands"
+            target="_blank"
+            rel="noopener noreferrer">aquí</a
+          >.
+        </li>
+        <li>
+          Si formas parte de este mundillo, tal vez quieras pasarte por la wiki de <a
+            class="link-style"
+            href="https://wiki.fansubhub.com/es/home"
+            target="_blank"
+            rel="noopener noreferrer">FansubHub</a
+          >, donde encontrarás guías bastante completas acerca de la elaboración de subtítulos o muxing y está en constante expansión.
+        </li>
+        <li>
+          También existe <a
+            class="link-style"
+            href="https://HispaDex.zgn.moe/"
+            target="_blank"
+            rel="noopener noreferrer">HispaDex</a
+          >, que es una tabla que recopila todos lanzamientos de animes trabajados por fansubs y es mantenido por miembros de
+          División Cero.
+        </li>
+        <li>
+          Otro lugar que te puede ser muy útil es <a
+            class="link-style"
+            href="https://subanima.net/"
+            target="_blank"
+            rel="noopener noreferrer">Subanima</a
+          >, un foro dedicado a la recopilación de subtítulos tanto oficiales
+          como de fansubs, solo recuerda registrarte.
+        </li>
+      </ul>
+
+      <h3 style="margin-top: 2rem; font-size: 1.5rem;">APIs públicas</h3>
+      <p>
+        Para quienes quieran acceder a los datos desde sus propios scripts, he
+        puesto a disposición las APIs REST del sitio de forma pública, estas te
+        permiten consultar información de entradas, animes y fansubs. Puedes
+        acceder a los siguientes endpoints base en: <a
+          href="https://datafansub.bye.moe/boochi/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link-style">https://datafansub.bye.moe/api/</a
+        ><br />
+      </p>
+      <ul>
+        <li>
+          <a
+            href="https://datafansub.bye.moe/api/collections/entries/records"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-style">/collections/entries/records</a>
+        </li>
+        <li>
+          <a
+            href="https://datafansub.bye.moe/api/collections/animes/records"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-style">/collections/animes/records</a>
+        </li>
+        <li>
+          <a
+            href="https://datafansub.bye.moe/api/collections/fansubs/records"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-style">/collections/fansubs/records</a>
+        </li>
+      </ul>
+
+      <p>
+        Estas APIs te permiten realizar consultas filtradas y obtener datos en
+        formato JSON. Si necesitas más detalles sobre cómo utilizar los
+        parámetros de consulta, revisa la documentación de PocketBase, la base
+        sobre la cual están construidas las APIs.<br />
+      </p>
+
+      <h3 style="margin-top: 2rem; font-size: 1.5rem;">
+        Sobre los fansubs listados
+      </h3>
+      <p>
+        Solo se consideran fansubs de <strong>nivel 3 (L3)</strong>, que
+        generalmente entregan una buena calidad en sus lanzamientos,
+        principalmente en <strong>2025</strong> y cumplen criterios como TLC, TS,
+        editing, song styling, fixed timing issues y QC, según la wiki de nekoBT
+        <a
+          class="link-style"
+          href="https://wiki.nekobt.to/info/sub-levels/"
+          target="_blank"
+          rel="noopener noreferrer">https://wiki.nekobt.to/info/sub-levels/</a
+        >.
+      </p>
+
+      <h3 style="margin-top: 2rem; font-size: 1.5rem;">Top entries</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left;">Fansub</th>
+              <th style="text-align:right;">Entries</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              fansubEntryCount.map((f) => (
+                <tr>
+                  <td>
+                    {f.website ? (
+                      <a
+                        href={f.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="link-style"
+                      >
+                        {f.name}
+                      </a>
+                    ) : (
+                      f.name
+                    )}
+                  </td>
+                  <td style="text-align: right;">{f.count}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>

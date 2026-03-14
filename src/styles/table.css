@@ -1,0 +1,231 @@
+.table-wrapper {
+  margin: 2rem 2rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+}
+
+.table-wrapper::-webkit-scrollbar { height: 6px; background: transparent; }
+.table-wrapper::-webkit-scrollbar-thumb { background: transparent; border-radius: 3px; }
+.table-wrapper:hover::-webkit-scrollbar-thumb,
+.table-wrapper:active::-webkit-scrollbar-thumb,
+.table-wrapper:focus::-webkit-scrollbar-thumb { background: var(--border); }
+.table-wrapper:hover { scrollbar-color: var(--border) transparent; }
+
+#animeTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 800px;
+}
+
+#animeTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+#animeTable th {
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  padding: 1rem 1.25rem;
+  text-align: left;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+}
+
+#animeTable th:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background-color: var(--border);
+}
+
+#animeTable td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition);
+  vertical-align: middle;
+}
+
+#animeTable tbody tr:last-child td { border-bottom: none; }
+#animeTable tbody tr { animation: fadeIn 0.3s ease forwards; }
+
+@media (hover: hover) and (pointer: fine) {
+  #animeTable tbody tr:hover td { background-color: var(--hover); }
+}
+
+.poster-cell { width: 80px; }
+
+.poster-wrapper {
+  position: relative;
+  display: inline-block;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.poster {
+  width: 60px;
+  height: 85px;
+  object-fit: cover;
+  display: block;
+  transition: var(--transition);
+}
+
+.anime-name { font-weight: 600; color: var(--on-surface); }
+
+.romaji {
+  font-style: italic;
+  color: var(--secondary);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+  opacity: 0.8;
+}
+
+.fansubs-season { font-size: 0.9rem; line-height: 1.5; }
+.fansubs-season div { margin-bottom: 0.25rem; }
+.fansubs-season strong { color: var(--primary); font-weight: 600; }
+
+.anime-row { cursor: pointer; }
+
+.expand-content { display: none; background-color: var(--background); }
+.expanded + .expand-content { display: table-row; }
+
+.expand-inner { padding: 1.5rem; }
+
+.season-select-container { margin-bottom: 1.5rem; position: relative; }
+
+.season-select-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--on-surface);
+  font-size: 0.95rem;
+}
+
+.season-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  max-width: 300px;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--on-surface);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+.season-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+}
+
+.season-select option {
+  padding: 0.5rem;
+  background-color: var(--surface);
+  color: var(--on-surface);
+}
+
+.season-select:active,
+.season-select:focus { border-color: var(--primary); }
+
+.season-select option:checked {
+  background-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.entry-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: var(--surface);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.entry-table th {
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.75rem 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.entry-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.entry-table tr:last-child td { border-bottom: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .entry-table tr:hover td { background-color: var(--hover); }
+}
+
+.entry-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.75rem;
+  margin: 0.125rem;
+  background-color: var(--primary);
+  color: var(--on-primary) !important;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.entry-link:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.flag-icon {
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+  margin-left: 6px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  vertical-align: middle;
+}

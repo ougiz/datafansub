@@ -1,0 +1,47 @@
+---
+export const prerender = false;
+
+import Navbar from "../components/common/navbar.astro";
+import Pagination from "../components/common/pagination.astro";
+import EntryTable from "../components/entryTable.astro";
+import { fetchData } from "../lib/datafansub";
+const {
+  animes,
+  animeInfoMap,
+  groupFansubsBySeason,
+  getAnimeType,
+  entries,
+  fansubMap,
+} = await fetchData();
+---
+
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <title>dataFansub</title>
+
+<meta name="title" content="dataFansub" />
+<meta name="description" content="Index dedicado a recomendar releases trabajados por fansubs en español." />
+<meta name="theme-color" content="#E02D60">
+<meta property="og:title" content="dataFansub" />
+<meta property="og:description" content="Index dedicado a recomendar releases trabajados por fansubs en español, que publican principalmente en Nyaa o nekoBT." />
+<meta property="og:image" content="https://datafansub.zgn.moe/og-image.jpg" />
+<meta property="og:url" content="https://datafansub.zgn.moe/" />
+<meta property="og:type" content="website" />
+  </head>
+  <body>
+    <Navbar />
+    <EntryTable
+      animes={animes}
+      animeInfoMap={animeInfoMap}
+      groupFansubsBySeason={groupFansubsBySeason}
+      getAnimeType={getAnimeType}
+      entries={entries}
+      fansubMap={fansubMap}
+    />
+    <Pagination />
+  </body>
+</html>

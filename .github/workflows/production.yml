@@ -1,0 +1,47 @@
+name: Deploy to production
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '*.md'
+
+env:
+  PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: production
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and tag image
+        run: |
+          docker build \
+            --build-arg PUBLIC_API_URL=${{ env.PUBLIC_API_URL }} \
+            -t datafansub/frontend:${{ github.sha }} .
+          docker tag datafansub/frontend:${{ github.sha }} datafansub/frontend:prod-latest
+
+      - name: Deploy to Swarm
+        run: |
+          export GIT_SHA=${{ github.sha }}
+          docker service update \
+            --image datafansub/frontend:${{ github.sha }} \
+            --update-parallelism 1 \
+            --update-delay 10s \
+            --update-order start-first \
+            datafansub_datafansub_prod
+
+      - name: Verify deployment
+        run: |
+          sleep 10
+          docker service ps datafansub_datafansub_prod --no-trunc
+
+      - name: Cleanup old images
+        run: |
+          docker image prune -f --filter "until=24h"

@@ -1,0 +1,43 @@
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #333;
+  white-space: nowrap;
+}
+
+thead tr {
+  background-color: #1f1f1f;
+}
+
+.link-style {
+  color: #a8d0ff;
+  text-decoration: none;
+  cursor: pointer;
+}
+.link-style:hover,
+.link-style:focus {
+  text-decoration: underline;
+  color: #d0e7ff;
+}
+
+p {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+@media (max-width: 600px) {
+  table {
+    font-size: 0.9rem;
+  }
+}

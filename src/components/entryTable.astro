@@ -1,0 +1,450 @@
+---
+import type { Anime, Entry, Fansub } from "../lib/datafansub";
+import "../styles/global.css";
+import Scripts from "./scripts.astro";
+
+const {
+  animes,
+  animeInfoMap,
+  groupFansubsBySeason,
+  getAnimeType,
+  entries,
+  fansubMap,
+} = Astro.props as {
+  animes: Anime[];
+  animeInfoMap: Map<string, { cover: string; year: string | number }>;
+  groupFansubsBySeason: (animeId: string) => Map<number, string>;
+  getAnimeType: (animeId: string) => "movie" | "anime";
+  fansubMap: Map<string, string>;
+  entries: Entry[];
+};
+
+const getLatestUpdate = (animeId: string) => {
+  const animeEntries = entries.filter((e) => e.anime === animeId);
+  if (animeEntries.length === 0) return "";
+
+  const latestEntry = animeEntries.reduce((latest, current) =>
+    (current.updated || current.created) > (latest.updated || latest.created)
+      ? current
+      : latest
+  );
+
+  return latestEntry.updated || latestEntry.created;
+};
+
+const sortedAnimes = animes.sort((a, b) => {
+  const updatedA = getLatestUpdate(a.id);
+  const updatedB = getLatestUpdate(b.id);
+  return updatedB.localeCompare(updatedA);
+});
+---
+
+<div class="table-wrapper">
+  <table id="animeTable">
+    <thead>
+      <tr>
+        <th>Poster</th>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Type</th>
+        <th>Fansub</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        sortedAnimes.map((anime) => {
+          const info = animeInfoMap.get(anime.anilist_id) ?? {
+            cover: "/default-poster.png",
+            year: "–",
+          };
+          const fansubsBySeason = groupFansubsBySeason(anime.id);
+          const animeType = getAnimeType(anime.id) as "movie" | "anime" | "ova";
+          const isMovie = animeType === "movie";
+          const isOva = animeType === "ova";
+          const animeEntries = Array.isArray(entries)
+            ? entries.filter((e) => e.anime === anime.id)
+            : [];
+          const latestUpdate = getLatestUpdate(anime.id);
+
+          const seasons = Array.from(
+            new Set(animeEntries.map((e) => e.season))
+          ).sort((a, b) => a - b);
+          const initialSeason = seasons.length > 0 ? seasons[0] : 1;
+
+          return (
+            <>
+              <tr
+                class="anime-row"
+                data-anime={anime.id}
+                data-name={anime.name.toLowerCase()}
+                data-fansub={animeEntries
+                  .flatMap((e) => e.fansub)
+                  .map((f) => fansubMap.get(f) ?? f)
+                  .join(", ")
+                  .toLowerCase()}
+                data-updated={latestUpdate}
+              >
+                <td class="poster-cell" data-label="Poster">
+                  <div class="poster-wrapper">
+                    <img
+                      class="poster"
+                      src={info.cover}
+                      alt={`Poster de ${anime.name}`}
+                      loading="lazy"
+                    />
+                  </div>
+                </td>
+                <td data-label="Name" title={anime.name}>
+                  {anime.name}
+                  {anime.romaji && <span class="romaji">{anime.romaji}</span>}
+                </td>
+
+                <td data-label="Year">{info.year}</td>
+                <td data-label="Type">{animeType}</td>
+                <td class="fansubs-season" data-label="Fansub">
+                  {(() => {
+                    const sortedSeasons = Array.from(
+                      fansubsBySeason.entries()
+                    ).sort((a, b) => a[0] - b[0]);
+
+                    const firstTwoSeasons = sortedSeasons.slice(0, 2);
+
+                    const hasMoreSeasons = sortedSeasons.length > 2;
+
+                    return (
+                      <>
+                        {firstTwoSeasons.map(([season, fansubsStr], index) => {
+                          const seasonLabel =
+                            season === 0
+                              ? animeType === "movie"
+                                ? "Movie"
+                                : animeType === "ova"
+                                  ? "OVA"
+                                  : "Special"
+                              : `S0${season}`;
+                          return (
+                            <div>
+                              <strong>{seasonLabel}:</strong> {fansubsStr}{" "}
+                              {hasMoreSeasons &&
+                                index === firstTwoSeasons.length - 1 && (
+                                  <em>(more)</em>
+                                )}
+                            </div>
+                          );
+                        })}
+                      </>
+                    );
+                  })()}
+                </td>
+              </tr>
+
+              <tr class="expand-content">
+                <td colspan="5">
+                  <div class="expand-inner">
+                    <button
+                      class="copy-link-btn"
+                      onclick={`copyEntryLink('${anime.id}')`}
+                      style="
+                              background:none;
+                              border:none;
+                              cursor:pointer;
+                              padding:4px;
+                              display:inline-flex;
+                              align-items:center;
+                              justify-content:center;
+                            "
+                      title="Copy link"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M10 1H2a1 1 0 0 0-1 1v10h1V2h8V1z" />
+                        <path d="M13 3H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 10H6V5h6v8z" />
+                      </svg>
+                    </button>
+                    {animeEntries.length === 0 && <p>nothing.</p>}
+
+                    {animeEntries.length > 0 && (
+                      <>
+                        {animeType !== "movie" && animeType !== "ova" && (
+                          <div class="season-select-container">
+                            <label class="season-select-label" />
+                            <select
+                              class="season-select"
+                              onchange={`handleSeasonChange(this, '${anime.id}')`}
+                            >
+                              {seasons.map((season) => {
+                                const label =
+                                  season === 0
+                                    ? isMovie
+                                      ? "Movie"
+                                      : isOva
+                                        ? "OVA"
+                                        : "Specials"
+                                    : `Season ${season}`;
+                                return (
+                                  <option
+                                    value={season}
+                                    selected={season === initialSeason}
+                                  >
+                                    {label}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                        )}
+
+                        {seasons.map((season) => (
+                          <div
+                            class="season-details"
+                            data-anime={anime.id}
+                            data-season={season}
+                            style={
+                              season !== initialSeason ? "display:none;" : ""
+                            }
+                          >
+                            {season === 0 ? (
+                              (() => {
+                                const specialEntries = animeEntries.filter(
+                                  (x) => x.season === 0
+                                );
+
+                                const specialsByName = specialEntries.reduce(
+                                  (acc: { [key: string]: any[] }, entry) => {
+                                    let key = entry.name?.trim();
+
+                                    if (
+                                      !key &&
+                                      (animeType === "movie" ||
+                                        animeType === "ova")
+                                    ) {
+                                      key = "";
+                                    } else if (!key) {
+                                      key = "Unnamed Special";
+                                    }
+
+                                    if (!acc[key]) acc[key] = [];
+                                    acc[key].push(entry);
+                                    return acc;
+                                  },
+                                  {}
+                                );
+
+                                return Object.entries(specialsByName).map(
+                                  ([name, entries]) => (
+                                    <div style="margin-bottom: 1rem;">
+                                      <p style="margin: 0.5rem 0; font-style: italic;">
+                                        {name}
+                                      </p>
+                                      <table class="entry-table">
+                                        <thead>
+                                          <tr>
+                                            <th>Fansub</th>
+                                            <th>status</th>
+                                            <th>Source</th>
+                                            <th>spanish variant</th>
+                                            <th>Links</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {entries.map((entry) => {
+                                            const variant =
+                                              typeof entry.spanish_variant ===
+                                              "string"
+                                                ? entry.spanish_variant
+                                                    .toLowerCase()
+                                                    .trim()
+                                                : "";
+
+                                            return (
+                                              <tr>
+                                                <td data-label="Fansub">
+                                                  {entry.fansub
+                                                    .map(
+                                                      (f: string) =>
+                                                        fansubMap.get(f) ?? f
+                                                    )
+
+                                                    .join(", ")}
+                                                </td>
+                                                <td data-label="Status">
+                                                  {entry.status}
+                                                </td>
+                                                <td data-label="Source">
+                                                  {entry.source}
+                                                </td>
+                                                <td data-label="Spanish variant">
+                                                  <span style="display:inline-flex;align-items:center;gap:4px;">
+                                                    <span class="variant-text">
+                                                      {entry.spanish_variant}
+                                                    </span>
+                                                    {variant.includes(
+                                                      "es-419"
+                                                    ) && (
+                                                      <img
+                                                        src="/flags/mexico.svg"
+                                                        alt="Latinoamérica"
+                                                        title="Latinoamérica"
+                                                        style={{
+                                                          width: "20px",
+                                                          verticalAlign:
+                                                            "middle",
+                                                        }}
+                                                      />
+                                                    )}
+                                                    {variant.includes(
+                                                      "es-es"
+                                                    ) && (
+                                                      <img
+                                                        src="/flags/spain.svg"
+                                                        alt="Castellano"
+                                                        title="Castellano"
+                                                        style={{
+                                                          width: "20px",
+                                                          verticalAlign:
+                                                            "middle",
+                                                        }}
+                                                      />
+                                                    )}
+                                                  </span>
+                                                </td>
+                                                <td data-label="Links">
+                                                  {entry.nyaa && (
+                                                    <a
+                                                      href={entry.nyaa}
+                                                      target="_blank"
+                                                      class="entry-link"
+                                                    >
+                                                      Nyaa
+                                                    </a>
+                                                  )}
+                                                  {entry.nekobt && (
+                                                    <a
+                                                      href={entry.nekobt}
+                                                      target="_blank"
+                                                      class="entry-link"
+                                                    >
+                                                      Nekobt
+                                                    </a>
+                                                  )}
+                                                </td>
+                                              </tr>
+                                            );
+                                          })}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  )
+                                );
+                              })()
+                            ) : (
+                              <table class="entry-table">
+                                <thead>
+                                  <tr>
+                                    <th>Fansub</th>
+                                    <th>status</th>
+                                    <th>Source</th>
+                                    <th>spanish variant</th>
+                                    <th>Links</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {animeEntries
+                                    .filter((x) => x.season === season)
+                                    .map((entry) => {
+                                      const variant =
+                                        typeof entry.spanish_variant ===
+                                        "string"
+                                          ? entry.spanish_variant
+                                              .toLowerCase()
+                                              .trim()
+                                          : "";
+
+                                      return (
+                                        <tr>
+                                          <td data-label="Fansub">
+                                            {entry.fansub
+                                              .map((f) => fansubMap.get(f) ?? f)
+                                              .join(", ")}
+                                          </td>
+                                          <td data-label="Status">
+                                            {entry.status}
+                                          </td>
+                                          <td data-label="Source">
+                                            {entry.source}
+                                          </td>
+                                          <td data-label="Spanish variant">
+                                            <span style="display:inline-flex;align-items:center;gap:4px;">
+                                              <span class="variant-text">
+                                                {entry.spanish_variant}
+                                              </span>
+                                              {variant.includes("es-419") && (
+                                                <img
+                                                  src="/flags/mexico.svg"
+                                                  alt="Latinoamérica"
+                                                  title="Latinoamérica"
+                                                  style={{
+                                                    width: "20px",
+                                                    verticalAlign: "middle",
+                                                  }}
+                                                />
+                                              )}
+                                              {variant.includes("es-es") && (
+                                                <img
+                                                  src="/flags/spain.svg"
+                                                  alt="Castellano"
+                                                  title="Castellano"
+                                                  style={{
+                                                    width: "20px",
+                                                    verticalAlign: "middle",
+                                                  }}
+                                                />
+                                              )}
+                                            </span>
+                                          </td>
+                                          <td data-label="Links">
+                                            {entry.nyaa && (
+                                              <a
+                                                href={entry.nyaa}
+                                                target="_blank"
+                                                class="entry-link"
+                                              >
+                                                Nyaa
+                                              </a>
+                                            )}
+                                            {entry.nekobt && (
+                                              <a
+                                                href={entry.nekobt}
+                                                target="_blank"
+                                                class="entry-link"
+                                              >
+                                                Nekobt
+                                              </a>
+                                            )}
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                </tbody>
+                              </table>
+                            )}
+                          </div>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            </>
+          );
+        })
+      }
+    </tbody>
+  </table>
+</div>
+<Scripts />
