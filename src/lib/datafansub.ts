@@ -4,20 +4,29 @@ import { groupFansubsBySeason, getAnimeType } from "./utils";
 
 const API_URL = import.meta.env.PUBLIC_API_URL;
 
+async function fetchAllPages<T>(baseUrl: string): Promise<T[]> {
+  let page = 1;
+  let allItems: T[] = [];
+  let hasMore = true;
+
+  while (hasMore) {
+    const res = await fetch(`${baseUrl}?page=${page}&perPage=100`);
+    const data = await res.json();
+    const items = data.items || data;
+    allItems = [...allItems, ...items];
+    hasMore = data.totalPages > page;
+    page++;
+  }
+
+  return allItems;
+}
+
 export async function fetchData() {
-  const [fansubsRes, animesRes, entriesRes] = await Promise.all([
-    fetch(`${API_URL}/api/collections/fansubs/records`),
-    fetch(`${API_URL}/api/collections/animes/records`),
-    fetch(`${API_URL}/api/collections/entries/records`),
+  const [fansubs, animes, entries] = await Promise.all([
+    fetchAllPages<Fansub>(`${API_URL}/api/collections/fansubs/records`),
+    fetchAllPages<Anime>(`${API_URL}/api/collections/animes/records`),
+    fetchAllPages<Entry>(`${API_URL}/api/collections/entries/records`),
   ]);
-
-  const fansubsData = await fansubsRes.json();
-  const animesData = await animesRes.json();
-  const entriesData = await entriesRes.json();
-
-  const fansubs: Fansub[] = fansubsData.items || fansubsData;
-  const animes: Anime[] = animesData.items || animesData;
-  const entries: Entry[] = entriesData.items || entriesData;
 
   const animeInfoMap = await fetchAnimeInfoFromAnilist(animes);
   const fansubMap = new Map(fansubs.map((f) => [f.id, f.name]));
