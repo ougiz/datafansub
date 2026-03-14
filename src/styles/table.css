@@ -62,6 +62,7 @@
 
 #animeTable tbody tr:last-child td { border-bottom: none; }
 #animeTable tbody tr { animation: fadeIn 0.3s ease forwards; }
+#animeTable tbody:not(.js-ready) { opacity: 0; }
 
 @media (hover: hover) and (pointer: fine) {
   #animeTable tbody tr:hover td { background-color: var(--hover); }

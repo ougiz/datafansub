@@ -1,6 +1,6 @@
 # dataFansub
 
-An index dedicated to recommending releases by Spanish-language fansubs, primarily publishing on Nyaa and NekoBT. The site keeps current season anime updated while gradually adding titles from previous seasons. This site only displays release information—we don't host any torrents.
+An index dedicated to recommending releases by Spanish fansubs, primarily published on Nyaa and NekoBT. The site keeps the current season's anime updated while gradually adding titles from previous seasons. This site only displays release information; we do not host any torrents.
 
 ## Features
 
