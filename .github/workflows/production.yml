@@ -8,6 +8,7 @@ on:
       - 'LICENSE'
       - '.gitignore'
       - '*.md'
+      - 'pb_schema.json'
 
 env:
   PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
