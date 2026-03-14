@@ -17,6 +17,9 @@ RUN pnpm install --frozen-lockfile && pnpm run build
 # Production stage
 FROM node:20-alpine AS runner
 
+ARG PUBLIC_API_URL
+ENV PUBLIC_API_URL=${PUBLIC_API_URL}
+
 WORKDIR /app
 
 RUN apk add --no-cache wget
