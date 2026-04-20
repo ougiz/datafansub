@@ -9,6 +9,7 @@ on:
       - '.gitignore'
       - '*.md'
       - 'pb_schema.json'
+  workflow_dispatch:
 
 env:
   PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
