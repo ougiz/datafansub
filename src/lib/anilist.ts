@@ -43,15 +43,17 @@ export async function fetchAnimeInfoFromAnilist(
         variables: { ids: chunk },
       }),
     });
+    if (!res.ok) continue;
     const data = await res.json();
-    aniListMedia = aniListMedia.concat(data.data.Page.media);
+    const media = data?.data?.Page?.media;
+    if (Array.isArray(media)) aniListMedia = aniListMedia.concat(media);
   }
 
   return new Map(
     aniListMedia.map((m) => [
       m.id.toString(),
       {
-        cover: m.coverImage.large || m.coverImage.medium,
+        cover: m.coverImage?.large || m.coverImage?.medium,
         year: m.startDate?.year ?? "–",
       },
     ])
