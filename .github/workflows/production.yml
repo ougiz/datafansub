@@ -13,36 +13,19 @@ on:
 
 env:
   PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
+  CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
 
 jobs:
   deploy:
     runs-on: self-hosted
     environment: production
-    
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build and tag image
+      - name: Deploy
         run: |
-          docker build \
-            --build-arg PUBLIC_API_URL=${{ env.PUBLIC_API_URL }} \
-            -t datafansub/frontend:${{ github.sha }} .
-          docker tag datafansub/frontend:${{ github.sha }} datafansub/frontend:prod-latest
-
-      - name: Deploy to Swarm
-        run: |
-          export GIT_SHA=${{ github.sha }}
-          docker service update \
-            --image datafansub/frontend:${{ github.sha }} \
-            --update-parallelism 1 \
-            --update-delay 10s \
-            --update-order start-first \
-            datafansub_datafansub_prod
-
-      - name: Verify deployment
-        run: |
-          sleep 10
-          docker service ps datafansub_datafansub_prod --no-trunc
+          docker compose up -d --build
 
       - name: Cleanup old images
         run: |
