@@ -28,6 +28,8 @@ services:
     restart: unless-stopped
     depends_on:
       - pocketbase
+    networks:
+      - datafansub
 
 networks:
   datafansub: {}
