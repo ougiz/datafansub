@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@astrojs/node':
         specifier: ^9.5.5
-        version: 9.5.5(astro@5.18.1(rollup@4.59.0)(typescript@5.9.3))
+        version: 9.5.5(astro@5.18.1(@types/node@26.6.1)(rollup@4.59.0)(typescript@5.9.3))
       astro:
         specifier: ^5.16.0
-        version: 5.18.1(rollup@4.59.0)(typescript@5.9.3)
+        version: 5.18.1(@types/node@26.6.1)(rollup@4.59.0)(typescript@5.9.3)
       react:
         specifier: ^19.1.1
         version: 19.2.4
@@ -21,6 +21,9 @@ importers:
         specifier: ^19.1.1
         version: 19.2.4(react@19.2.4)
     devDependencies:
+      '@types/node':
+        specifier: ^26.6.1
+        version: 26.6.1
       '@types/react':
         specifier: ^19.1.9
         version: 19.2.14
@@ -732,6 +735,9 @@ packages:
 
   '@types/nlcst@2.0.3':
     resolution: {integrity: sha512-vSYNSDe6Ix3q+6Z7ri9lyWqgGhJTmzRjZRqyq15N0Z/1/UnVsno9G/N40NBijoYx2seFDIl0+B2mgAb9mezUCA==}
+
+  '@types/node@26.6.1':
+    resolution: {integrity: sha512-VqGJBMCtdhqkBUCcBLvywI0NJ+KLuVzgNnlBUNFOQjqVxzo2lxLUNg1DSey8+u2u6ktswSAxg+s68QLzWHNOuA==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -1576,6 +1582,9 @@ packages:
   uncrypto@0.1.3:
     resolution: {integrity: sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q==}
 
+  undici-types@8.9.0:
+    resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
+
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
 
@@ -1811,10 +1820,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@9.5.5(astro@5.18.1(rollup@4.59.0)(typescript@5.9.3))':
+  '@astrojs/node@9.5.5(astro@5.18.1(@types/node@26.6.1)(rollup@4.59.0)(typescript@5.9.3))':
     dependencies:
       '@astrojs/internal-helpers': 0.7.6
-      astro: 5.18.1(rollup@4.59.0)(typescript@5.9.3)
+      astro: 5.18.1(@types/node@26.6.1)(rollup@4.59.0)(typescript@5.9.3)
       send: 1.2.1
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -2251,6 +2260,10 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
+  '@types/node@26.6.1':
+    dependencies:
+      undici-types: 8.9.0
+
   '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:
       '@types/react': 19.2.14
@@ -2286,7 +2299,7 @@ snapshots:
 
   array-iterate@2.0.1: {}
 
-  astro@5.18.1(rollup@4.59.0)(typescript@5.9.3):
+  astro@5.18.1(@types/node@26.6.1)(rollup@4.59.0)(typescript@5.9.3):
     dependencies:
       '@astrojs/compiler': 2.13.1
       '@astrojs/internal-helpers': 0.7.6
@@ -2343,8 +2356,8 @@ snapshots:
       unist-util-visit: 5.1.0
       unstorage: 1.17.4
       vfile: 6.0.3
-      vite: 6.4.1
-      vitefu: 1.1.2(vite@6.4.1)
+      vite: 6.4.1(@types/node@26.6.1)
+      vitefu: 1.1.2(vite@6.4.1(@types/node@26.6.1))
       xxhash-wasm: 1.1.0
       yargs-parser: 21.1.1
       yocto-spinner: 0.2.3
@@ -3493,6 +3506,8 @@ snapshots:
 
   uncrypto@0.1.3: {}
 
+  undici-types@8.9.0: {}
+
   unified@11.0.5:
     dependencies:
       '@types/unist': 3.0.3
@@ -3577,7 +3592,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite@6.4.1:
+  vite@6.4.1(@types/node@26.6.1):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.3)
@@ -3586,11 +3601,12 @@ snapshots:
       rollup: 4.59.0
       tinyglobby: 0.2.15
     optionalDependencies:
+      '@types/node': 26.6.1
       fsevents: 2.3.3
 
-  vitefu@1.1.2(vite@6.4.1):
+  vitefu@1.1.2(vite@6.4.1(@types/node@26.6.1)):
     optionalDependencies:
-      vite: 6.4.1
+      vite: 6.4.1(@types/node@26.6.1)
 
   web-namespaces@2.0.1: {}
 
