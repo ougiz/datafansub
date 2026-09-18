@@ -10,6 +10,8 @@ An index dedicated to recommending releases by Spanish fansubs, primarily publis
 - Dark mode support
 - Responsive design for mobile and desktop
 - Pagination and search functionality
+- AniList metadata with rate-limit handling and retry with backoff
+- Cover images cached and served locally
 
 ## Tech Stack
 
@@ -23,7 +25,7 @@ An index dedicated to recommending releases by Spanish fansubs, primarily publis
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - pnpm (recommended)
 
 ### Installation
@@ -69,12 +71,15 @@ src/
 ├── lib/                  # TypeScript utilities
 │   ├── types.ts          # Type definitions
 │   ├── utils.ts          # Helper functions
-│   ├── anilist.ts        # AniList API integration
+│   ├── cache.ts          # Disk cache with TTL
+│   ├── anilist.ts        # AniList API integration with rate limiting
 │   └── datafansub.ts     # Main data fetching
 ├── pages/                # Astro pages
 │   ├── index.astro
 │   ├── about.astro
 │   ├── health.astro
+│   ├── poster/           # Locally served cached cover images
+│   │   └── [id].ts
 │   └── boochi.ts
 └── styles/               # CSS files (modular)
     ├── variables.css
