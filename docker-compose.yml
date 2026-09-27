@@ -17,8 +17,8 @@ services:
     command: serve --http=0.0.0.0:8090 --dir="/pb/pb_data"
     restart: unless-stopped
     volumes:
-      - /opt/datafansub/pocketbase/pb_data:/pb/pb_data
-      - /opt/datafansub/pocketbase/pb_migrations:/pb/pb_migrations
+      - /opt/datafansub-pb/pb_data:/pb/pb_data
+      - /opt/datafansub-pb/pb_migrations:/pb/pb_migrations
     networks:
       - datafansub
 
