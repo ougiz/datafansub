@@ -1,6 +1,6 @@
 import type { Anime, AnimeInfo } from "./types";
 import { chunkArray } from "./utils";
-import { cacheGet, cacheSet } from "./cache"
+import { cacheGet, cacheGetStale, cacheSet } from "./cache"
 
 
 const ANILIST_QUERY = `
@@ -29,22 +29,30 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 async function queryChunk(ids: number[]): Promise < any[] > {
   const body = JSON.stringify({ query: ANILIST_QUERY, variables: { ids } });
 
-  for (let attempt = 0; attempt < 5; attempt++) {
+  for (let attempt = 0; attempt < 3; attempt++) {
     if (attempt > 0) await sleep(Math.min(1000 * 2 ** attempt, 10_000));
-    const res = await fetch("https://graphql.anilist.co", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body,
-    });
+    let res: Response;
+    try {
+      res = await fetch("https://graphql.anilist.co", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body,
+        signal: AbortSignal.timeout(5_000),
+      });
+    } catch {
+      continue; // timeout
+    }
     if (res.ok) {
       const data = await res.json();
       return Array.isArray(data?.data?.Page?.media)
         ? data.data.Page.media
         : [];
     }
+    // 4xx (ej. 403 API deshabilitada) no se reintenta
+    if (res.status >= 400 && res.status < 500 && res.status !== 429) return [];
     const retryAfter = Number(res.headers.get("retry-after"));
     if (retryAfter > 0) await sleep(retryAfter * 1000);
   }
@@ -75,6 +83,10 @@ export async function fetchAnimeInfoFromAnilist(
         "anilist:coverIndex",
         Object.fromEntries(media.map((m) => [m.id, m.coverImage?.large || m.coverImage?.medium]))
       );
+    } else {
+      // AniList caído: sirve el caché vencido si existe.
+      const stale = cacheGetStale<any[]>(cacheKey);
+      if (stale?.length) media = stale;
     }
   }
 

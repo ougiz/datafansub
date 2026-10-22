@@ -7,6 +7,8 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+    volumes:
+      - /opt/datafansub/cache:/app/.datafansub-cache
     networks:
       - datafansub
     healthcheck:
@@ -17,8 +19,8 @@ services:
     command: serve --http=0.0.0.0:8090 --dir="/pb/pb_data"
     restart: unless-stopped
     volumes:
-      - /opt/datafansub-pb/pb_data:/pb/pb_data
-      - /opt/datafansub-pb/pb_migrations:/pb/pb_migrations
+      - /opt/datafansub/db/pb_data:/pb/pb_data
+      - /opt/datafansub/db/pb_migrations:/pb/pb_migrations
     networks:
       - datafansub
 

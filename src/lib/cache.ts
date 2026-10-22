@@ -17,6 +17,13 @@ export function cacheGet<T>(key: string): T | undefined {
   return undefined;
 }
 
+export function cacheGetStale<T>(key: string): T | undefined {
+  try {
+    return JSON.parse(readFileSync(cachePath(key), "utf8")).value as T;
+  } catch {}
+  return undefined;
+}
+
 export function cacheSet(key: string, value: unknown): void {
   mkdirSync(cacheDir, { recursive: true });
   writeFileSync(cachePath(key), JSON.stringify({ savedAt: Date.now(), value }));
