@@ -1,7 +1,8 @@
 export const prerender = false;
 
 export const GET = () => {
-  return new Response(`<!DOCTYPE html>
+  return new Response(
+    `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -29,7 +30,9 @@ export const GET = () => {
 <body>
   <div>IF YOU'RE READING THIS, GO fuck YOURSELF</div>
 </body>
-</html>`, {
-    headers: { 'Content-Type': 'text/html' }
-  });
+</html>`,
+    {
+      headers: { "Content-Type": "text/html" },
+    },
+  );
 };

@@ -1,7 +1,6 @@
 import type { Anime, AnimeInfo } from "./types";
 import { chunkArray } from "./utils";
-import { cacheGet, cacheGetStale, cacheSet } from "./cache"
-
+import { cacheGet, cacheGetStale, cacheSet } from "./cache";
 
 const ANILIST_QUERY = `
   query ($ids: [Int]) {
@@ -25,10 +24,13 @@ const ANILIST_QUERY = `
   }
 `;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const COOLDOWN_MS = 5 * 60 * 1000;
+let anilistDownUntil = 0;
 
-async function queryChunk(ids: number[]): Promise < any[] > {
+async function queryChunk(ids: number[]): Promise<any[]> {
   const body = JSON.stringify({ query: ANILIST_QUERY, variables: { ids } });
 
+  if (Date.now() < anilistDownUntil) return [];
   for (let attempt = 0; attempt < 3; attempt++) {
     if (attempt > 0) await sleep(Math.min(1000 * 2 ** attempt, 10_000));
     let res: Response;
@@ -43,27 +45,30 @@ async function queryChunk(ids: number[]): Promise < any[] > {
         signal: AbortSignal.timeout(5_000),
       });
     } catch {
-      continue; // timeout
+      anilistDownUntil = Date.now() + COOLDOWN_MS;
+      continue; // network error: retry
     }
     if (res.ok) {
+      anilistDownUntil = 0;
       const data = await res.json();
-      return Array.isArray(data?.data?.Page?.media)
-        ? data.data.Page.media
-        : [];
+      return Array.isArray(data?.data?.Page?.media) ? data.data.Page.media : [];
     }
-    // 4xx (ej. 403 API deshabilitada) no se reintenta
-    if (res.status >= 400 && res.status < 500 && res.status !== 429) return [];
+
+    if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+      anilistDownUntil = Date.now() + COOLDOWN_MS;
+      return [];
+    }
     const retryAfter = Number(res.headers.get("retry-after"));
     if (retryAfter > 0) await sleep(retryAfter * 1000);
   }
-return [];
+  return [];
 }
 
 export async function fetchAnimeInfoFromAnilist(
-  animes: Anime[]
+  animes: Anime[],
 ): Promise<Map<string, AnimeInfo>> {
   const anilistIds = Array.from(
-    new Set(animes.map((a) => parseInt(a.anilist_id)))
+    new Set(animes.map((a) => parseInt(a.anilist_id))),
   );
   if (anilistIds.length === 0) return new Map();
 
@@ -81,10 +86,11 @@ export async function fetchAnimeInfoFromAnilist(
       cacheSet(cacheKey, media);
       cacheSet(
         "anilist:coverIndex",
-        Object.fromEntries(media.map((m) => [m.id, m.coverImage?.large || m.coverImage?.medium]))
+        Object.fromEntries(
+          media.map((m) => [m.id, m.coverImage?.large || m.coverImage?.medium]),
+        ),
       );
     } else {
-      // AniList caído: sirve el caché vencido si existe.
       const stale = cacheGetStale<any[]>(cacheKey);
       if (stale?.length) media = stale;
     }
@@ -97,6 +103,6 @@ export async function fetchAnimeInfoFromAnilist(
         cover: `/poster/${m.id}`,
         year: m.startDate?.year ?? "–",
       },
-    ])
+    ]),
   );
 }
