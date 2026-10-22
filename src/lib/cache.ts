@@ -7,7 +7,7 @@ const TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 function cachePath(key: string): string {
   const hash = createHash("md5").update(key).digest("hex");
   return join(cacheDir, hash + ".json");
-  }
+}
 
 export function cacheGet<T>(key: string): T | undefined {
   try {

@@ -7,17 +7,17 @@
   const tableBody = animeTable.getElementsByTagName("tbody")[0];
 
   const prevPageBtn = document.getElementById(
-    "prevPageBtn"
+    "prevPageBtn",
   ) as HTMLButtonElement;
   const nextPageBtn = document.getElementById(
-    "nextPageBtn"
+    "nextPageBtn",
   ) as HTMLButtonElement;
   const pageInfo = document.getElementById("pageInfo") as HTMLSpanElement;
   const pageInput = document.getElementById("pageInput") as HTMLInputElement;
 
   const filterBtn = document.getElementById("filterBtn") as HTMLButtonElement;
   const mobileFilterMenu = document.getElementById(
-    "mobileFilterMenu"
+    "mobileFilterMenu",
   ) as HTMLDivElement;
 
   const rowsPerPage = 15;
@@ -31,10 +31,10 @@
     HTMLTableRowElement,
   ][] {
     const allRows = Array.from(
-      document.querySelectorAll("tr.anime-row")
+      document.querySelectorAll("tr.anime-row"),
     ) as HTMLTableRowElement[];
     const allExpandRows = Array.from(
-      document.querySelectorAll("tr.expand-content")
+      document.querySelectorAll("tr.expand-content"),
     ) as HTMLTableRowElement[];
     const pairs: [HTMLTableRowElement, HTMLTableRowElement][] = [];
     for (let i = 0; i < allRows.length; i++) {
@@ -78,59 +78,58 @@
     attachRowClickHandlers();
   }
 
- function sortAndFilterTable(): void {
-  const filter = input.value.trim().toLowerCase();
-  const selected = sortSelect.value;
+  function sortAndFilterTable(): void {
+    const filter = input.value.trim().toLowerCase();
+    const selected = sortSelect.value;
 
-  if (filter === "") {
-    filteredSortedPairs = [...allPairsOriginal];
-  } else {
-    filteredSortedPairs = allPairsOriginal.filter(([row]) => {
-      const name = row.getAttribute("data-name") || "";
-      const fansub = row.getAttribute("data-fansub") || "";
-      const romajiSpan = row.querySelector("td:nth-child(2) .romaji");
-      const romaji = romajiSpan
-        ? romajiSpan.textContent?.toLowerCase() || ""
-        : "";
-      return (
-        name.includes(filter) ||
-        romaji.includes(filter) ||
-        fansub.includes(filter)
+    if (filter === "") {
+      filteredSortedPairs = [...allPairsOriginal];
+    } else {
+      filteredSortedPairs = allPairsOriginal.filter(([row]) => {
+        const name = row.getAttribute("data-name") || "";
+        const fansub = row.getAttribute("data-fansub") || "";
+        const romajiSpan = row.querySelector("td:nth-child(2) .romaji");
+        const romaji = romajiSpan
+          ? romajiSpan.textContent?.toLowerCase() || ""
+          : "";
+        return (
+          name.includes(filter) ||
+          romaji.includes(filter) ||
+          fansub.includes(filter)
+        );
+      });
+    }
+
+    if (selected === "recently-updated") {
+      filteredSortedPairs.sort(([rowA], [rowB]) => {
+        const updatedA = rowA.getAttribute("data-updated") || "";
+        const updatedB = rowB.getAttribute("data-updated") || "";
+        return updatedB.localeCompare(updatedA);
+      });
+    } else if (selected === "name-asc") {
+      filteredSortedPairs.sort(([rowA], [rowB]) =>
+        (rowA.getAttribute("data-name") || "").localeCompare(
+          rowB.getAttribute("data-name") || "",
+        ),
       );
-    });
+    } else if (selected === "year-asc") {
+      filteredSortedPairs.sort(([rowA], [rowB]) => {
+        const yearA = rowA.cells[2]?.textContent?.trim() || "";
+        const yearB = rowB.cells[2]?.textContent?.trim() || "";
+        return yearA.localeCompare(yearB);
+      });
+    } else if (selected === "year-desc") {
+      filteredSortedPairs.sort(([rowA], [rowB]) => {
+        const yearA = rowA.cells[2]?.textContent?.trim() || "";
+        const yearB = rowB.cells[2]?.textContent?.trim() || "";
+        return yearB.localeCompare(yearA);
+      });
+    }
+
+    currentPage = 1;
+    updatePagination();
+    tableBody.classList.add("js-ready");
   }
-
-  if (selected === "recently-updated") {
-    filteredSortedPairs.sort(([rowA], [rowB]) => {
-      const updatedA = rowA.getAttribute("data-updated") || "";
-      const updatedB = rowB.getAttribute("data-updated") || "";
-      return updatedB.localeCompare(updatedA);
-    });
-  } else if (selected === "name-asc") {
-    filteredSortedPairs.sort(([rowA], [rowB]) =>
-      (rowA.getAttribute("data-name") || "").localeCompare(
-        rowB.getAttribute("data-name") || ""
-      )
-    );
-  } else if (selected === "year-asc") {
-    filteredSortedPairs.sort(([rowA], [rowB]) => {
-      const yearA = rowA.cells[2]?.textContent?.trim() || "";
-      const yearB = rowB.cells[2]?.textContent?.trim() || "";
-      return yearA.localeCompare(yearB);
-    });
-  } else if (selected === "year-desc") {
-    filteredSortedPairs.sort(([rowA], [rowB]) => {
-      const yearA = rowA.cells[2]?.textContent?.trim() || "";
-      const yearB = rowB.cells[2]?.textContent?.trim() || "";
-      return yearB.localeCompare(yearA);
-    });
-  } 
-
-  currentPage = 1;
-  updatePagination();
-  tableBody.classList.add("js-ready");
-}
-
 
   function attachRowClickHandlers(): void {
     document.querySelectorAll(".anime-row").forEach((row) => {
@@ -280,7 +279,7 @@
       .writeText(url)
       .then(() => {
         const btn = document.querySelector(
-          `button[onclick="copyEntryLink('${animeId}')"]`
+          `button[onclick="copyEntryLink('${animeId}')"]`,
         ) as HTMLButtonElement;
         if (!btn) return;
 
@@ -341,7 +340,7 @@
 
   window.handleSeasonChange = function (
     select: HTMLSelectElement,
-    animeId: string
+    animeId: string,
   ): void {
     document
       .querySelectorAll(`.season-details[data-anime="${animeId}"]`)
@@ -355,14 +354,14 @@
     allPairsOriginal = captureOriginalPairs();
     const filter = input.value.trim().toLowerCase();
     const selected = sortSelect.value;
-    
+
     if (filter === "" && selected === "recently-updated") {
       filteredSortedPairs = [...allPairsOriginal];
     } else {
       sortAndFilterTable();
       return;
     }
-    
+
     currentPage = 1;
     updatePagination();
     tableBody.classList.add("js-ready");
