@@ -8,14 +8,14 @@ export function chunkArray<T>(arr: T[], size: number): T[][] {
 
 export function groupFansubsBySeason(
   entries: import("./types").Entry[],
-  fansubMap: Map<string, string>
+  fansubMap: Map<string, string>,
 ): Map<number, string> {
   const seasonsMap = new Map<number, string[][]>();
 
   entries.forEach((entry) => {
     const season = entry.season;
     const fansubsNames = entry.fansub.map(
-      (id) => fansubMap.get(id) ?? "Desconocido"
+      (id) => fansubMap.get(id) ?? "Desconocido",
     );
     if (!seasonsMap.has(season)) {
       seasonsMap.set(season, []);
@@ -35,7 +35,7 @@ export function groupFansubsBySeason(
 
 export function getAnimeType(
   animeId: string,
-  entries: import("./types").Entry[]
+  entries: import("./types").Entry[],
 ): "movie" | "anime" | "ova" {
   const entriesForAnime = entries.filter((e) => e.anime === animeId);
 

@@ -10,12 +10,22 @@
   scrollbar-width: thin;
 }
 
-.table-wrapper::-webkit-scrollbar { height: 6px; background: transparent; }
-.table-wrapper::-webkit-scrollbar-thumb { background: transparent; border-radius: 3px; }
+.table-wrapper::-webkit-scrollbar {
+  height: 6px;
+  background: transparent;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
 .table-wrapper:hover::-webkit-scrollbar-thumb,
 .table-wrapper:active::-webkit-scrollbar-thumb,
-.table-wrapper:focus::-webkit-scrollbar-thumb { background: var(--border); }
-.table-wrapper:hover { scrollbar-color: var(--border) transparent; }
+.table-wrapper:focus::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+.table-wrapper:hover {
+  scrollbar-color: var(--border) transparent;
+}
 
 #animeTable {
   width: 100%;
@@ -60,13 +70,19 @@
   vertical-align: middle;
 }
 
-#animeTable tbody tr:last-child td { border-bottom: none; }
-
-@media (hover: hover) and (pointer: fine) {
-  #animeTable tbody tr:hover td { background-color: var(--hover); }
+#animeTable tbody tr:last-child td {
+  border-bottom: none;
 }
 
-.poster-cell { width: 80px; }
+@media (hover: hover) and (pointer: fine) {
+  #animeTable tbody tr:hover td {
+    background-color: var(--hover);
+  }
+}
+
+.poster-cell {
+  width: 80px;
+}
 
 .poster-wrapper {
   position: relative;
@@ -85,7 +101,10 @@
   transition: var(--transition);
 }
 
-.anime-name { font-weight: 600; color: var(--on-surface); }
+.anime-name {
+  font-weight: 600;
+  color: var(--on-surface);
+}
 
 .romaji {
   font-style: italic;
@@ -96,18 +115,38 @@
   opacity: 0.8;
 }
 
-.fansubs-season { font-size: 0.9rem; line-height: 1.5; }
-.fansubs-season div { margin-bottom: 0.25rem; }
-.fansubs-season strong { color: var(--primary); font-weight: 600; }
+.fansubs-season {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.fansubs-season div {
+  margin-bottom: 0.25rem;
+}
+.fansubs-season strong {
+  color: var(--primary);
+  font-weight: 600;
+}
 
-.anime-row { cursor: pointer; }
+.anime-row {
+  cursor: pointer;
+}
 
-.expand-content { display: none; background-color: var(--background); }
-.expanded + .expand-content { display: table-row; }
+.expand-content {
+  display: none;
+  background-color: var(--background);
+}
+.expanded + .expand-content {
+  display: table-row;
+}
 
-.expand-inner { padding: 1.5rem; }
+.expand-inner {
+  padding: 1.5rem;
+}
 
-.season-select-container { margin-bottom: 1.5rem; position: relative; }
+.season-select-container {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
 
 .season-select-label {
   display: block;
@@ -152,7 +191,9 @@
 }
 
 .season-select:active,
-.season-select:focus { border-color: var(--primary); }
+.season-select:focus {
+  border-color: var(--primary);
+}
 
 .season-select option:checked {
   background-color: var(--primary);
@@ -188,10 +229,14 @@
   border-bottom: 1px solid var(--border);
 }
 
-.entry-table tr:last-child td { border-bottom: none; }
+.entry-table tr:last-child td {
+  border-bottom: none;
+}
 
 @media (hover: hover) and (pointer: fine) {
-  .entry-table tr:hover td { background-color: var(--hover); }
+  .entry-table tr:hover td {
+    background-color: var(--hover);
+  }
 }
 
 .entry-link {

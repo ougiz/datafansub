@@ -1,0 +1,9 @@
+services:
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    command: serve --http=0.0.0.0:8090 --dir="/pb/pb_data"
+    ports:
+      - "8090:8090"
+    volumes:
+      - /opt/datafansub/db/pb_data:/pb/pb_data
+      - /opt/datafansub/db/pb_migrations:/pb/pb_migrations

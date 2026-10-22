@@ -1,4 +1,4 @@
-import type { Fansub, Anime, Entry } from "./types";
+import type { Fansub, Anime, Entry, AnimeInfo } from "./types";
 import { fetchAnimeInfoFromAnilist } from "./anilist";
 import { groupFansubsBySeason, getAnimeType } from "./utils";
 
@@ -28,7 +28,12 @@ export async function fetchData() {
     fetchAllPages<Entry>(`${API_URL}/api/collections/entries/records`),
   ]);
 
-  const animeInfoMap = await fetchAnimeInfoFromAnilist(animes);
+  let animeInfoMap: Map<string, AnimeInfo> = new Map();
+  try {
+    animeInfoMap = await fetchAnimeInfoFromAnilist(animes);
+  } catch {
+    // AniList down.
+  }
   const fansubMap = new Map(fansubs.map((f) => [f.id, f.name]));
 
   const getGroupFansubsBySeason = (animeId: string) => {

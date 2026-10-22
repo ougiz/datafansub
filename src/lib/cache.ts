@@ -7,12 +7,19 @@ const TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 function cachePath(key: string): string {
   const hash = createHash("md5").update(key).digest("hex");
   return join(cacheDir, hash + ".json");
-  }
+}
 
 export function cacheGet<T>(key: string): T | undefined {
   try {
     const { savedAt, value } = JSON.parse(readFileSync(cachePath(key), "utf8"));
     if (Date.now() - savedAt < TTL_MS) return value as T;
+  } catch {}
+  return undefined;
+}
+
+export function cacheGetStale<T>(key: string): T | undefined {
+  try {
+    return JSON.parse(readFileSync(cachePath(key), "utf8")).value as T;
   } catch {}
   return undefined;
 }
